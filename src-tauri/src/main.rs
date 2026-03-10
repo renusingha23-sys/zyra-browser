@@ -4,21 +4,15 @@ use tauri::{WindowEvent, WebviewWindow};
 
 #[tauri::command]
 fn clean_data(window: tauri::Window) {
-    window
-        .with_webview(|webview| {
-            use webkit2gtk::{WebViewExt, WebsiteDataManagerExt};
-
-            if let Some(wv) = webview.downcast_ref::<webkit2gtk::WebView>() {
-                let context = wv.context();
-
-                // Clear cache
-                context.clear_cache();
-
-                // Clear databases (localStorage, IndexedDB etc.)
-                context.clear_all_databases();
-            }
-        })
-        .ok();
+    #[cfg(target_os = "linux")] // Only run this on Linux
+    window.with_webview(|webview| {
+        use webkit2gtk::{WebViewExt, WebsiteDataManagerExt};
+        if let Some(wv) = webview.downcast_ref::<webkit2gtk::WebView>() {
+            let context = wv.context();
+            context.clear_cache();
+            context.clear_all_databases();
+        }
+    }).ok();
 }
 
 fn main() {
