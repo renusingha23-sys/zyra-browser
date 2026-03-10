@@ -56,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zeon-browser-appimage
-          path: src-tauri/target/release/bundle/appimage/*.AppImage
+          path: src-tauri/target/release/bundle/appimage/*
