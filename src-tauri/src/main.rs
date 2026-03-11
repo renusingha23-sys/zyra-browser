@@ -3,6 +3,24 @@
 use std::sync::Mutex;
 use tauri::Manager;
 use url::Url;
+use webkit2gtk::WebView;
+use webkit2gtk::traits::*;
+use gtk::prelude::*;
+
+fn create_browser(url: &str) {
+    gtk::init().unwrap();
+
+    let window = gtk::Window::new(gtk::WindowType::Toplevel);
+    window.set_default_size(1200, 800);
+
+    let webview = WebView::new();
+    webview.load_uri(url);
+
+    window.add(&webview);
+    window.show_all();
+
+    gtk::main();
+}
 
 struct BrowserState {
     history: Mutex<Vec<String>>,
@@ -54,6 +72,22 @@ fn reload_window(window: tauri::Window) {
 #[tauri::command]
 fn get_bookmarks(state: tauri::State<BrowserState>) -> Vec<String> {
     state.bookmarks.lock().unwrap().clone()
+}
+
+#[tauri::command]
+fn reload(webview: tauri::WebviewWindow) {
+    webview.eval("window.location.reload()").unwrap();
+}
+
+#[tauri::command]
+fn navigate(input: String) -> String {
+
+    if input.starts_with("http") {
+        input
+    } else {
+        format!("https://duckduckgo.com/?q={}", input)
+    }
+
 }
 
 #[tauri::command]
